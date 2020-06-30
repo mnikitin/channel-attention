@@ -26,8 +26,8 @@ def parse_args():
                         help='number of gpus to use.')
     parser.add_argument('--model', type=str, default='resnet',
                         help='model to use. options are resnet and wrn. default is resnet.')
-    parser.add_argument('--eca', action='store_true',
-                        help='whether use ECA for residual blocks. default is false.')
+    parser.add_argument('--attention', type=str, choices=['eca', 'gct', 'se', None], default=None,
+                        help='channel attention type to use in residual blocks.')
     parser.add_argument('-j', '--num-data-workers', dest='num_workers', default=4, type=int,
                         help='number of preprocessing workers')
     parser.add_argument('--num-epochs', type=int, default=3,
@@ -79,7 +79,7 @@ def main():
     lr_decay_epoch = [int(i) for i in opt.lr_decay_epoch.split(',')] + [np.inf]
 
     model_name = opt.model
-    kwargs = {'classes': classes, 'use_eca': opt.eca}
+    kwargs = {'classes': classes, 'attention': opt.attention}
     net = get_model(model_name, **kwargs)
     if opt.resume_from:
         net.load_parameters(opt.resume_from, ctx = context)

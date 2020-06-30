@@ -30,7 +30,7 @@ from mxnet.gluon import nn
 from mxnet.gluon.nn import BatchNorm
 from mxnet import cpu, gpu
 
-from eca_module import ECA
+from attention import Attention
 
 # Helpers
 def _conv3x3(channels, stride, in_channel):
@@ -42,7 +42,7 @@ def _conv3x3(channels, stride, in_channel):
 class CIFARBasicBlockV1(HybridBlock):
     def __init__(self, channels, stride, downsample=False, in_channels=0,
                  norm_layer=BatchNorm, norm_kwargs=None,
-                 use_eca=False, **kwargs):
+                 attention=None, **kwargs):
         super(CIFARBasicBlockV1, self).__init__(**kwargs)
         self.body = nn.HybridSequential(prefix='')
         self.body.add(_conv3x3(channels, stride, in_channels))
@@ -50,7 +50,7 @@ class CIFARBasicBlockV1(HybridBlock):
         self.body.add(nn.Activation('relu'))
         self.body.add(_conv3x3(channels, 1, channels))
         self.body.add(norm_layer(**({} if norm_kwargs is None else norm_kwargs)))
-        self.eca = ECA() if use_eca else None
+        self.attention = Attention(attention, channels) if attention else None
         if downsample:
             self.downsample = nn.HybridSequential(prefix='')
             self.downsample.add(nn.Conv2D(channels, kernel_size=1, strides=stride,
@@ -62,8 +62,8 @@ class CIFARBasicBlockV1(HybridBlock):
     def hybrid_forward(self, F, x):
         residual = x
         x = self.body(x)
-        if self.eca:
-            x = self.eca(x)
+        if self.attention:
+            x = self.attention(x)
         if self.downsample:
             residual = self.downsample(residual)
         x = F.Activation(x + residual, act_type='relu')
@@ -72,7 +72,7 @@ class CIFARBasicBlockV1(HybridBlock):
 class CIFARBasicBlockV2(HybridBlock):
     def __init__(self, channels, stride, downsample=False, in_channels=0,
                  norm_layer=BatchNorm, norm_kwargs=None, 
-                 use_eca=False, **kwargs):
+                 attention=None, **kwargs):
         super(CIFARBasicBlockV2, self).__init__(**kwargs)
         self.body = nn.HybridSequential(prefix='')
         self.body.add(norm_layer(**({} if norm_kwargs is None else norm_kwargs)))
@@ -81,7 +81,7 @@ class CIFARBasicBlockV2(HybridBlock):
         self.body.add(norm_layer(**({} if norm_kwargs is None else norm_kwargs)))
         self.body.add(nn.Activation('relu'))
         self.body.add(_conv3x3(channels, 1, channels))
-        self.eca = ECA() if use_eca else None
+        self.attention = Attention(attention, channels) if attention else None
         if downsample:
             self.downsample = nn.Conv2D(channels, 1, stride, use_bias=False,
                                         in_channels=in_channels)
@@ -91,8 +91,8 @@ class CIFARBasicBlockV2(HybridBlock):
     def hybrid_forward(self, F, x):
         residual = x
         x = self.body(x)
-        if self.eca:
-            x = self.eca(x)
+        if self.attention:
+            x = self.attention(x)
         if self.downsample:
             residual = self.downsample(residual)
         x = x + residual
@@ -102,10 +102,10 @@ class CIFARBasicBlockV2(HybridBlock):
 class CIFARResNetV1(HybridBlock):
     def __init__(self, block, layers, channels, classes=10,
                  norm_layer=BatchNorm, norm_kwargs=None,
-                 use_eca=False, **kwargs):
+                 attention=None, **kwargs):
         super(CIFARResNetV1, self).__init__(**kwargs)
         assert len(layers) == len(channels) - 1
-        self.use_eca = use_eca
+        self.attention = attention
         with self.name_scope():
             self.features = nn.HybridSequential(prefix='')
             self.features.add(nn.Conv2D(channels[0], 3, 1, 1, use_bias=False))
@@ -126,11 +126,11 @@ class CIFARResNetV1(HybridBlock):
         with layer.name_scope():
             layer.add(block(channels, stride, channels != in_channels, in_channels=in_channels,
                             norm_layer=norm_layer, norm_kwargs=norm_kwargs,
-                            use_eca=self.use_eca, prefix=''))
+                            attention=self.attention, prefix=''))
             for _ in range(layers-1):
                 layer.add(block(channels, 1, False, in_channels=channels,
                                 norm_layer=norm_layer, norm_kwargs=norm_kwargs,
-                                use_eca=self.use_eca, prefix=''))
+                                attention=self.attention, prefix=''))
         return layer
 
     def hybrid_forward(self, F, x):
@@ -142,10 +142,10 @@ class CIFARResNetV1(HybridBlock):
 class CIFARResNetV2(HybridBlock):
     def __init__(self, block, layers, channels, classes=10,
                  norm_layer=BatchNorm, norm_kwargs=None,
-                 use_eca=False, **kwargs):
+                 attention=None, **kwargs):
         super(CIFARResNetV2, self).__init__(**kwargs)
         assert len(layers) == len(channels) - 1
-        self.use_eca = use_eca
+        self.attention = attention
         with self.name_scope():
             self.features = nn.HybridSequential(prefix='')
             self.features.add(norm_layer(scale=False, center=False,
@@ -173,11 +173,11 @@ class CIFARResNetV2(HybridBlock):
         with layer.name_scope():
             layer.add(block(channels, stride, channels != in_channels, in_channels=in_channels,
                             norm_layer=norm_layer, norm_kwargs=norm_kwargs,
-                            use_eca=self.use_eca, prefix=''))
+                            attention=self.attention, prefix=''))
             for _ in range(layers-1):
                 layer.add(block(channels, 1, False, in_channels=channels,
                                 norm_layer=norm_layer, norm_kwargs=norm_kwargs,
-                                use_eca=self.use_eca, prefix=''))
+                                attention=self.attention, prefix=''))
         return layer
 
     def hybrid_forward(self, F, x):
