@@ -61,45 +61,45 @@ python3 train_cifar10.py --mode hybrid --num-gpus 1 -j 8 --batch-size 128 --num-
     <td>cifar_resnet20_v1</td>
     <td align="center">0.0344</span></td>
     <td align="center">0.9171</span></td>
-    <td align="center">TBA</span></td>
-    <td align="center">TBA</span></td>
+    <td align="center">0.0325</span></td>
+    <td align="center">0.9161</span></td>
     <td align="center">0.0302</span></td>
     <td align="center">0.9189</span></td>
-    <td align="center">TBA</span></td>
-    <td align="center">TBA</span></td>
+    <td align="center">0.0292</span></td>
+    <td align="center">0.9150</span></td>
   </tr>
   <tr>
     <td>cifar_resnet20_v2</span></td>
     <td align="center">0.1088</span></td>
     <td align="center">0.9133</span></td>
-    <td align="center">TBA</span></td>
-    <td align="center">TBA</span></td>
+    <td align="center">0.0316</span></td>
+    <td align="center">0.9162</span></td>
     <td align="center">0.0328</span></td>
     <td align="center">0.9194</span></td>
-    <td align="center">TBA</span></td>
-    <td align="center">TBA</span></td>
+    <td align="center">0.0354</span></td>
+    <td align="center">0.9172</span></td>
   </tr>
   <tr>
     <td>cifar_resnet56_v1</span></td>
     <td align="center">0.0431</span></td>
     <td align="center">0.9154</span></td>
-    <td align="center">TBA</span></td>
-    <td align="center">TBA</span></td>
+    <td align="center">0.0280</span></td>
+    <td align="center">0.9238</span></td>
     <td align="center">0.0170</span></td>
     <td align="center">0.9243</span></td>
-    <td align="center">TBA</span></td>
-    <td align="center">TBA</span></td>
+    <td align="center">0.0244</span></td>
+    <td align="center">0.9238</span></td>
   </tr>
   <tr>
     <td>cifar_resnet56_v2</span></td>
     <td align="center">0.0629</span></td>
     <td align="center">0.9165</span></td>
-    <td align="center">TBA</span></td>
-    <td align="center">TBA</span></td>
+    <td align="center">0.0268</span></td>
+    <td align="center">0.9243</span></td>
     <td align="center">0.0235</span></td>
     <td align="center">0.9218</span></td>
-    <td align="center">TBA</span></td>
-    <td align="center">TBA</span></td>
+    <td align="center">0.0330</span></td>
+    <td align="center">0.9200</span></td>
   </tr>
 </tbody>
 </table>
