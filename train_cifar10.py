@@ -26,8 +26,8 @@ def parse_args():
                         help='number of gpus to use.')
     parser.add_argument('--model', type=str, default='resnet',
                         help='model to use. options are resnet and wrn. default is resnet.')
-    parser.add_argument('--attention', type=str, choices=['eca', 'gct', 'se', None], default=None,
-                        help='channel attention type to use in residual blocks.')
+    parser.add_argument('--attention', type=str, choices=['eca', 'gct', 'se', 'se-v1', 'se-v2', 'se-v3', None],
+                        default=None, help='channel attention type to use in residual blocks.')
     parser.add_argument('-j', '--num-data-workers', dest='num_workers', default=4, type=int,
                         help='number of preprocessing workers')
     parser.add_argument('--num-epochs', type=int, default=3,
